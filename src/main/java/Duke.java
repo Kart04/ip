@@ -22,6 +22,35 @@ public class Duke {
                         System.out.println(todolist[i].toString());
                     }
                     System.out.println(line);
+                } else if (todo.startsWith("deadline")) {
+                    String rest = todo.substring(9);
+                    String[] split = rest.split("/by",2);
+                    String description = split[0].trim();
+                    String by = split.length > 1 ? split[1].trim() : "Never State!";
+                    todolist[listnumber] = new Deadline(description, by);
+                    listnumber++;
+                    System.out.println("Now you have " + listnumber + " tasks in the list");
+                    System.out.println(line);
+                } else if (todo.startsWith("TODO")) {
+                    String rest = todo.substring(5);
+                    todolist[listnumber] = new TODO(rest);
+                    listnumber++;
+                    System.out.println("Now you have " + listnumber + " tasks in the list");
+                    System.out.println(line);
+                } else if (todo.startsWith("Event")){
+                    String rest = todo.substring(6);
+                    String[] FromTo = rest.split("/from",2);
+                    String description = FromTo[0].trim();
+                    String temp = FromTo.length > 1 ? FromTo[1].trim() : "";
+                    String[] FromTo1 = temp.split("/to",2);
+                    String from = FromTo1.length > 0 ? FromTo1[0].trim() : "";
+                    String to = FromTo1.length > 1 ? FromTo1[1].trim() : "";
+                    todolist[listnumber] = new Event(description, from, to);
+                    listnumber++;
+                    System.out.println("Now you have " + listnumber + " tasks in the list");
+                    System.out.println(line);
+
+
                 } else if (todo.startsWith("mark")) {
                     int index = Integer.parseInt(todo.substring(5)) - 1;
 
