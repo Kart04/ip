@@ -87,11 +87,7 @@ public class Duke {
                         System.out.println("OPPS!!!! Please enter a number :)");
                     }
                     break;
-//                default:
-//                    System.out.println("Added: " + todo);
-//                    System.out.println(line);
-//                    todolist[listnumber] = new Task(todo);
-//                    listnumber++;
+
                 }
             } else {
                 System.out.println("Sorry, overflow of TODO list!");
