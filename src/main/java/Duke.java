@@ -30,7 +30,7 @@ public class Duke {
 
             String commandWord = input.split(" ")[0].toLowerCase();
 
-            // Check if input matches one of the known commands (using an enum for robustness)
+            // Check if input matches one of the known commands
             if (!Command.isValidCommand(commandWord)) {
                 System.out.println(line);
                 System.out.println(" OOPS!!! I'm sorry, but I don't know what that means :-(");
@@ -98,7 +98,7 @@ public class Duke {
         System.out.println(line);
         return listnumber;
     }
-
+    //adding comment for commit
     private static int getDeadlineDetails(String input, Task[] todolist, int listnumber, String line) throws DukeException {
         if (input.length() <= 9) {
             throw new DukeException("OOPS!!! The description of a deadline cannot be empty.");
