@@ -2,13 +2,14 @@ import Task.*;
 import errorcorrection.*;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Duke {
     public static void main(String[] args) {
         String line = "____________________________________________________________";
         String bye = "bye";
-        Task[] todolist = new Task[100];
-        int listnumber = 0;
+
+        ArrayList<Task> todolist = new ArrayList<Task>();
 
         System.out.println(line);
         System.out.println("Hello! I'm Speed\nWhat can I do for you?");
@@ -17,10 +18,6 @@ public class Duke {
         Scanner in = new Scanner(System.in);
 
         while (true) {
-            if (listnumber == 100) {
-                System.out.println("Sorry, overflow of TODO list!");
-                break;
-            }
 
             String input = in.nextLine().trim();
             if (input.isEmpty()) {
@@ -45,30 +42,30 @@ public class Duke {
                     return;
 
                 case "list":
-                    for (int i = 0; i < listnumber; i++) {
-                        System.out.println((i+1) + ". " + todolist[i]);
+                    for (int i = 0; i < todolist.size(); i++) {
+                        System.out.println((i+1) + ". " + todolist.get(i));
                     }
                     System.out.println(line);
                     break;
 
                 case "deadline":
-                    listnumber = getDeadlineDetails(input, todolist, listnumber, line);
+                    getDeadlineDetails(input, todolist, line);
                     break;
 
                 case "todo":
-                    listnumber = getTodoDetails(input, todolist, listnumber, line);
+                    getTodoDetails(input, todolist, line);
                     break;
 
                 case "event":
-                    listnumber = getEventDetails(input, todolist, listnumber, line);
+                    getEventDetails(input, todolist, line);
                     break;
 
                 case "mark":
-                    handleMarkUnmark(input, todolist, listnumber, line, true);
+                    handleMarkUnmark(input, todolist, line, true);
                     break;
 
                 case "unmark":
-                    handleMarkUnmark(input, todolist, listnumber, line, false);
+                    handleMarkUnmark(input, todolist, line, false);
                     break;
 
                 default:
@@ -84,7 +81,7 @@ public class Duke {
         }
     }
 
-    private static int getTodoDetails(String input, Task[] todolist, int listnumber, String line) throws DukeException {
+    private static void getTodoDetails(String input, ArrayList<Task> todolist, String line) throws DukeException {
         if (input.length() <= 5) {
             throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
         }
@@ -92,14 +89,13 @@ public class Duke {
         if (description.isEmpty()) {
             throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
         }
-        todolist[listnumber] = new TODO(description);
-        listnumber++;
-        System.out.println("Now you have " + listnumber + " tasks in the list");
+        todolist.add(new TODO(description));
+        System.out.println("Now you have " + todolist.size() + " tasks in the list");
         System.out.println(line);
-        return listnumber;
+
     }
     //adding comment for commit
-    private static int getDeadlineDetails(String input, Task[] todolist, int listnumber, String line) throws DukeException {
+    private static void getDeadlineDetails(String input, ArrayList<Task> todolist, String line) throws DukeException {
         if (input.length() <= 9) {
             throw new DukeException("OOPS!!! The description of a deadline cannot be empty.");
         }
@@ -113,14 +109,12 @@ public class Duke {
         if (by.isEmpty()) {
             throw new DukeException("OOPS!!! You must provide a /by for this deadline task.");
         }
-        todolist[listnumber] = new Deadline(description, by);
-        listnumber++;
-        System.out.println("Now you have " + listnumber + " tasks in the list");
+        todolist.add(new Deadline(description, by));
+        System.out.println("Now you have " + todolist.size() + " tasks in the list");
         System.out.println(line);
-        return listnumber;
     }
 
-    private static int getEventDetails(String input, Task[] todolist, int listnumber, String line) throws DukeException {
+    private static void getEventDetails(String input, ArrayList<Task> todolist, String line) throws DukeException {
         if (input.length() <= 6) {
             throw new DukeException("OOPS!!! The description of an event cannot be empty.");
         }
@@ -142,27 +136,25 @@ public class Duke {
         if (to.isEmpty()) {
             throw new DukeException("OOPS!!! The end time (/to) for the event is missing.");
         }
-        todolist[listnumber] = new Event(description, from, to);
-        listnumber++;
-        System.out.println("Now you have " + listnumber + " tasks in the list");
+        todolist.add(new Event(description, from, to));
+        System.out.println("Now you have " + todolist.size() + " tasks in the list");
         System.out.println(line);
-        return listnumber;
     }
 
-    private static void handleMarkUnmark(String input, Task[] todolist, int listnumber, String line, boolean mark) {
+    private static void handleMarkUnmark(String input, ArrayList<Task> todolist, String line, boolean mark) {
         try {
             String arg = mark ? input.substring(4).trim() : input.substring(6).trim();
             int index = Integer.parseInt(arg) - 1;
-            if (index < 0 || index >= listnumber) {
+            if (index < 0 || index >= todolist.size()) {
                 System.out.println(line);
                 System.out.println(" OOPS!!! Invalid task number. Please enter a valid index in your list.");
                 System.out.println(line);
                 return;
             }
             if (mark) {
-                todolist[index].markasDone();
+                todolist.get(index).markasDone();
             } else {
-                todolist[index].markAsNotDone();
+                todolist.get(index).markAsNotDone();
             }
             System.out.println(line);
         } catch (NumberFormatException e) {
