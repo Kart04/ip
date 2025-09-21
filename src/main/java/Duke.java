@@ -22,6 +22,7 @@ public class Duke {
             String input = in.nextLine().trim();
             if (input.isEmpty()) {
                 System.out.println("Please enter a command or task description.");
+                System.out.println(line);
                 continue;
             }
 
@@ -42,11 +43,18 @@ public class Duke {
                     return;
 
                 case "list":
-                    for (int i = 0; i < todolist.size(); i++) {
+
+                    if (!todolist.isEmpty()) {
+                        for (int i = 0; i < todolist.size(); i++) {
                         System.out.println((i+1) + ". " + todolist.get(i));
+                        }
+                        System.out.println(line);
+                        break;
+                    }else{
+                        System.out.println("There are no tasks in this list.");
+                        System.out.println(line);
+                        break;
                     }
-                    System.out.println(line);
-                    break;
 
                 case "deadline":
                     getDeadlineDetails(input, todolist, line);
@@ -66,6 +74,10 @@ public class Duke {
 
                 case "unmark":
                     handleMarkUnmark(input, todolist, line, false);
+                    break;
+
+                case "delete":
+                    handleDelete(input, todolist, line);
                     break;
 
                 default:
@@ -141,15 +153,12 @@ public class Duke {
         System.out.println(line);
     }
 
-    private static void handleMarkUnmark(String input, ArrayList<Task> todolist, String line, boolean mark) {
+    private static void handleMarkUnmark(String input, ArrayList<Task> todolist, String line, boolean mark) throws DukeException {
         try {
             String arg = mark ? input.substring(4).trim() : input.substring(6).trim();
             int index = Integer.parseInt(arg) - 1;
             if (index < 0 || index >= todolist.size()) {
-                System.out.println(line);
-                System.out.println(" OOPS!!! Invalid task number. Please enter a valid index in your list.");
-                System.out.println(line);
-                return;
+                throw new DukeException(line + " OOPS!!! Invalid task number. Please enter a valid index in your list." + line);
             }
             if (mark) {
                 todolist.get(index).markasDone();
@@ -158,8 +167,32 @@ public class Duke {
             }
             System.out.println(line);
         } catch (NumberFormatException e) {
+            throw new DukeException(" OOPS!!! The index provided is not a valid number.");
+        }
+    }
+
+    private static void handleDelete(String input, ArrayList<Task> todolist, String line) throws DukeException {
+        if(todolist.isEmpty()) {
+            throw new DukeException("There are no task currently to delete. :)");
+        }
+        if (input.length() < 7) {
+            throw new DukeException("Please input a number :)");
+        }
+        String number = input.substring(7).trim();
+        int  index;
+        try{
+            index = Integer.parseInt(number) - 1;
+        if(index >= 0 && index < todolist.size()) {
+            Task removedTask = todolist.remove(index);
+            System.out.println("Noted. I've removed this task: "+ removedTask);
+            System.out.println("Now you have " + todolist.size() + " tasks in the list");
             System.out.println(line);
-            System.out.println(" OOPS!!! The index provided is not a valid number.");
+        }else{
+            throw new DukeException("Please make sure you delete the task within the listed tasks!");
+        }
+
+        }catch(NumberFormatException e){
+            System.out.println("OOPS!!! The index provided is not a valid number.");
             System.out.println(line);
         }
     }
