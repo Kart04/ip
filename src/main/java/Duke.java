@@ -5,11 +5,13 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Duke {
+    private static Storage storage;
     public static void main(String[] args) {
         String line = "____________________________________________________________";
         String bye = "bye";
-
         ArrayList<Task> todolist = new ArrayList<Task>();
+        storage = new Storage("tasks.txt");
+
 
         System.out.println(line);
         System.out.println("Hello! I'm Speed\nWhat can I do for you?");
@@ -18,7 +20,6 @@ public class Duke {
         Scanner in = new Scanner(System.in);
 
         while (true) {
-
             String input = in.nextLine().trim();
             if (input.isEmpty()) {
                 System.out.println("Please enter a command or task description.");
@@ -80,6 +81,10 @@ public class Duke {
                     handleDelete(input, todolist, line);
                     break;
 
+                case "save":
+                    storage.saveTasks(todolist);
+                    System.out.println(line);
+                    break;
                 default:
                     System.out.println(line);
                     System.out.println(" OOPS!!! I'm sorry, but I don't know what that means :-(");
