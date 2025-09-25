@@ -2,8 +2,8 @@ package Task;
 
 public class TODO extends Task {
 
-    public TODO(String description) {
-        super(description);
+    public TODO(String description, boolean isDone) {
+        super(description, isDone);
     }
 
     @Override
@@ -11,5 +11,7 @@ public class TODO extends Task {
         return "[T]" + ("[" + getStatusIcon() + "] " + getDescription());
     }
 
+    @Override
+    public String toSaveFormat(){return "T | " + getIsDoneFormat() + " | "+ getDescription();}
 }
 

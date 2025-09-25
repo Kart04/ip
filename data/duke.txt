@@ -1,0 +1,2 @@
+D | 0 | hw | 3pm
+T | 0 | go home

@@ -4,9 +4,13 @@ public class Task {
     private String description;
     private boolean isDone;
 
-    public Task(String description){
+    public Task(String description, boolean isDone) {
         this.description = description;
-        isDone = false;
+        this.isDone = isDone;
+    }
+
+    public String toSaveFormat(){
+        return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
     public String getDescription() {
@@ -33,7 +37,11 @@ public class Task {
     }
 
     public String getStatusIcon(){
-        return isDone? "X" : " ";
+        return isDone ? "X" : " ";
+    }
+
+    public String getIsDoneFormat(){
+        return isDone ? "1" : "0";
     }
 
     public String toString(){

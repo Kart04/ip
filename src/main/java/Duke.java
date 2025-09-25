@@ -1,18 +1,31 @@
 import Task.*;
-import errorcorrection.*;
+import errorcorrection.Command;
+import errorcorrection.DukeException;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Duke {
-    private static Storage storage;
+    private static final String CMD_TODO     = "todo ";
+    private static final String CMD_DEADLINE = "deadline ";
+    private static final String CMD_EVENT    = "event ";
+    private static final String CMD_MARK     = "mark ";
+    private static final String CMD_UNMARK   = "unmark ";
+    private static final String CMD_DELETE   = "delete ";
+    private static final String CMD_SAVE     = "save";
+    private static Storage storage = new Storage("./data/duke.txt");
+    private static ArrayList<Task> todoList;
     public static void main(String[] args) {
-        String line = "____________________________________________________________";
-        String bye = "bye";
-        ArrayList<Task> todolist = new ArrayList<Task>();
-        storage = new Storage("tasks.txt");
-
-
+        final String line = "____________________________________________________________";
+        final String bye = "bye";
+        todoList = new ArrayList<Task>();
+        try{
+            todoList.addAll(storage.readFromFile());
+        }catch (IOException e){
+            System.out.println("Could not load saved tasks.");
+        }
         System.out.println(line);
         System.out.println("Hello! I'm Speed\nWhat can I do for you?");
         System.out.println(line);
@@ -29,10 +42,9 @@ public class Duke {
 
             String commandWord = input.split(" ")[0].toLowerCase();
 
-            // Check if input matches one of the known commands
             if (!Command.isValidCommand(commandWord)) {
                 System.out.println(line);
-                System.out.println(" OOPS!!! I'm sorry, but I don't know what that means :-(");
+                System.out.println(" OOPS!!! I'm sorry, but I don't know what that means :(");
                 System.out.println(line);
                 continue;
             }
@@ -45,46 +57,42 @@ public class Duke {
 
                 case "list":
 
-                    if (!todolist.isEmpty()) {
-                        for (int i = 0; i < todolist.size(); i++) {
-                        System.out.println((i+1) + ". " + todolist.get(i));
+                    if (!todoList.isEmpty()) {
+                        for (int i = 0; i < todoList.size(); i++) {
+                            System.out.println((i+1) + ". " + todoList.get(i));
                         }
                         System.out.println(line);
                         break;
-                    }else{
+                    } else {
                         System.out.println("There are no tasks in this list.");
                         System.out.println(line);
                         break;
                     }
 
                 case "deadline":
-                    getDeadlineDetails(input, todolist, line);
+                    getDeadlineDetails(input, todoList, line);
                     break;
 
                 case "todo":
-                    getTodoDetails(input, todolist, line);
+                    getTodoDetails(input, todoList, line);
                     break;
 
                 case "event":
-                    getEventDetails(input, todolist, line);
+                    getEventDetails(input, todoList, line);
                     break;
 
                 case "mark":
-                    handleMarkUnmark(input, todolist, line, true);
+                    handleMarkUnmark(input, todoList, line, true);
                     break;
 
                 case "unmark":
-                    handleMarkUnmark(input, todolist, line, false);
+                    handleMarkUnmark(input, todoList, line, false);
                     break;
 
                 case "delete":
-                    handleDelete(input, todolist, line);
+                    handleDelete(input, todoList, line);
                     break;
 
-                case "save":
-                    storage.saveTasks(todolist);
-                    System.out.println(line);
-                    break;
                 default:
                     System.out.println(line);
                     System.out.println(" OOPS!!! I'm sorry, but I don't know what that means :-(");
@@ -98,25 +106,35 @@ public class Duke {
         }
     }
 
-    private static void getTodoDetails(String input, ArrayList<Task> todolist, String line) throws DukeException {
-        if (input.length() <= 5) {
+    private static void getTodoDetails(String input, ArrayList<Task> todoList, String line) throws DukeException {
+        if (input.length() <= CMD_TODO.length()) {
             throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
         }
-        String description = input.substring(5).trim();
+        String description = input.substring(CMD_TODO.length()).trim();
         if (description.isEmpty()) {
             throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
         }
-        todolist.add(new TODO(description));
-        System.out.println("Now you have " + todolist.size() + " tasks in the list");
+        todoList.add(new TODO(description, false));
+        saveTasks();
+        StringBuilder sb = new StringBuilder();
+        for(Task t: todoList){
+            sb.append(t.toSaveFormat()).append(System.lineSeparator());
+        }try{
+            storage.writeToFile(todoList);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Now you have " + todoList.size() + " tasks in the list");
         System.out.println(line);
 
+
     }
-    //adding comment for commit
-    private static void getDeadlineDetails(String input, ArrayList<Task> todolist, String line) throws DukeException {
-        if (input.length() <= 9) {
-            throw new DukeException("OOPS!!! The description of a deadline cannot be empty.");
+
+    private static void getDeadlineDetails(String input, ArrayList<Task> todoList, String line) throws DukeException {
+        if (input.length() <= CMD_DEADLINE.length()) {
+            throw new DukeException("OOPS!!! Please type “deadline <description> /by <date>”.");
         }
-        String rest = input.substring(9);
+        String rest = input.substring(CMD_DEADLINE.length()).trim();
         String[] split = rest.split("/by", 2);
         String description = split[0].trim();
         if (description.isEmpty()) {
@@ -126,25 +144,26 @@ public class Duke {
         if (by.isEmpty()) {
             throw new DukeException("OOPS!!! You must provide a /by for this deadline task.");
         }
-        todolist.add(new Deadline(description, by));
-        System.out.println("Now you have " + todolist.size() + " tasks in the list");
+        todoList.add(new Deadline(description, by, false));
+        saveTasks();
+        System.out.println("Now you have " + todoList.size() + " tasks in the list");
         System.out.println(line);
     }
 
-    private static void getEventDetails(String input, ArrayList<Task> todolist, String line) throws DukeException {
-        if (input.length() <= 6) {
+    private static void getEventDetails(String input, ArrayList<Task> todoList, String line) throws DukeException {
+        if (input.length() <= CMD_EVENT.length()) {
             throw new DukeException("OOPS!!! The description of an event cannot be empty.");
         }
-        String rest = input.substring(6);
-        String[] fromTo = rest.split("/from", 2);
-        String description = fromTo[0].trim();
+        String rest = input.substring(CMD_EVENT.length()).trim();
+        String[] initialInput = rest.split("/from", 2);
+        String description = initialInput[0].trim();
         if (description.isEmpty()) {
             throw new DukeException("OOPS!!! The description of an event cannot be empty.");
         }
-        if (fromTo.length < 2 || fromTo[1].trim().isEmpty()) {
+        if (initialInput.length < 2 || initialInput[1].trim().isEmpty()) {
             throw new DukeException("OOPS!!! You must specify a /from time for the event.");
         }
-        String[] dateParts = fromTo[1].trim().split("/to", 2);
+        String[] dateParts = initialInput[1].trim().split("/to", 2);
         String from = dateParts[0].trim();
         String to = dateParts.length > 1 ? dateParts[1].trim() : "";
         if (from.isEmpty()) {
@@ -153,31 +172,33 @@ public class Duke {
         if (to.isEmpty()) {
             throw new DukeException("OOPS!!! The end time (/to) for the event is missing.");
         }
-        todolist.add(new Event(description, from, to));
-        System.out.println("Now you have " + todolist.size() + " tasks in the list");
+        todoList.add(new Event(description, from, to, false));
+        saveTasks();
+        System.out.println("Now you have " + todoList.size() + " tasks in the list");
         System.out.println(line);
     }
 
-    private static void handleMarkUnmark(String input, ArrayList<Task> todolist, String line, boolean mark) throws DukeException {
+    private static void handleMarkUnmark(String input, ArrayList<Task> todoList, String line, boolean mark) throws DukeException {
         try {
-            String arg = mark ? input.substring(4).trim() : input.substring(6).trim();
+            String arg = mark ? input.substring(CMD_MARK.length()).trim() : input.substring(CMD_UNMARK.length()).trim();
             int index = Integer.parseInt(arg) - 1;
-            if (index < 0 || index >= todolist.size()) {
-                throw new DukeException(line + " OOPS!!! Invalid task number. Please enter a valid index in your list." + line);
+            if (index < 0 || index >= todoList.size()) {
+                throw new DukeException(" OOPS!!! Invalid task number. Please enter a valid index in your list.");
             }
             if (mark) {
-                todolist.get(index).markasDone();
+                todoList.get(index).markasDone();
             } else {
-                todolist.get(index).markAsNotDone();
+                todoList.get(index).markAsNotDone();
             }
             System.out.println(line);
+            saveTasks();
         } catch (NumberFormatException e) {
             throw new DukeException(" OOPS!!! The index provided is not a valid number.");
         }
     }
 
-    private static void handleDelete(String input, ArrayList<Task> todolist, String line) throws DukeException {
-        if(todolist.isEmpty()) {
+    private static void handleDelete(String input, ArrayList<Task> todoList, String line) throws DukeException {
+        if(todoList.isEmpty()) {
             throw new DukeException("There are no task currently to delete. :)");
         }
         if (input.length() < 7) {
@@ -187,18 +208,27 @@ public class Duke {
         int  index;
         try{
             index = Integer.parseInt(number) - 1;
-        if(index >= 0 && index < todolist.size()) {
-            Task removedTask = todolist.remove(index);
+        if(index >= 0 && index < todoList.size()) {
+            Task removedTask = todoList.remove(index);
             System.out.println("Noted. I've removed this task: "+ removedTask);
-            System.out.println("Now you have " + todolist.size() + " tasks in the list");
+            System.out.println("Now you have " + todoList.size() + " tasks in the list");
             System.out.println(line);
-        }else{
+        } else {
             throw new DukeException("Please make sure you delete the task within the listed tasks!");
         }
-
+            saveTasks();
         }catch(NumberFormatException e){
             System.out.println("OOPS!!! The index provided is not a valid number.");
             System.out.println(line);
         }
     }
+
+    private static void saveTasks() {
+        try {
+            storage.writeToFile(todoList);
+        } catch (IOException e) {
+            System.out.println("Failed to save tasks: " + e.getMessage());
+        }
+    }
+
 }
