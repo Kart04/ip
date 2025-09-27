@@ -2,12 +2,14 @@ import Task.*;
 import errorcorrection.Command;
 import errorcorrection.DukeException;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-public class Duke {
+public class Speed {
+
+    private UI ui;
+
     private static final String CMD_TODO     = "todo ";
     private static final String CMD_DEADLINE = "deadline ";
     private static final String CMD_EVENT    = "event ";
@@ -17,6 +19,19 @@ public class Duke {
     private static final String CMD_SAVE     = "save";
     private static Storage storage = new Storage("./data/duke.txt");
     private static ArrayList<Task> todoList;
+
+    public Speed(){
+        ui = new UI();
+    }
+
+    public void run(){
+        ui.welcomeMsg();
+    }
+
+    public void bye(){
+        ui.goodByeMsg();
+    }
+
     public static void main(String[] args) {
         final String line = "____________________________________________________________";
         final String bye = "bye";
@@ -26,10 +41,8 @@ public class Duke {
         }catch (IOException e){
             System.out.println("Could not load saved tasks.");
         }
-        System.out.println(line);
-        System.out.println("Hello! I'm Speed\nWhat can I do for you?");
-        System.out.println(line);
 
+        new Speed().run();
         Scanner in = new Scanner(System.in);
 
         while (true) {
@@ -52,7 +65,7 @@ public class Duke {
             try {
                 switch (commandWord) {
                 case "bye":
-                    System.out.println("Bye. Hope to see you again soon!");
+                    new Speed().bye();
                     return;
 
                 case "list":
@@ -91,6 +104,10 @@ public class Duke {
 
                 case "delete":
                     handleDelete(input, todoList, line);
+                    break;
+
+                case "find":
+                    findTask(input, todoList, line);
                     break;
 
                 default:
@@ -229,6 +246,23 @@ public class Duke {
         } catch (IOException e) {
             System.out.println("Failed to save tasks: " + e.getMessage());
         }
+    }
+
+    private static void findTask(String input, ArrayList<Task> todoList, String line) throws DukeException {
+        String word = input.substring(4).trim();
+        boolean found = false;
+        for(Task task : todoList){
+            if(task.getDescription().toLowerCase().contains(word.toLowerCase())){
+                System.out.println(task);
+                found = true;
+            }
+
+        }
+        if(!found){
+            throw new DukeException("OOPS!!! The was not found in the list.");
+        }
+        System.out.println(line);
+
     }
 
 }

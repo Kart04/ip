@@ -1,2 +1,5 @@
 D | 0 | hw | 3pm
-T | 0 | go home
+T | 0 | gym
+D | 0 | return book | june 6th
+T | 0 | read book
+D | 0 | gym with bf | 10pm

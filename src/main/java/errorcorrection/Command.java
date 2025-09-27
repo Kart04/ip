@@ -1,7 +1,7 @@
 package errorcorrection;
 
 public enum Command {
-    BYE, LIST, DEADLINE, TODO, EVENT, MARK, UNMARK,DELETE,SAVE,READ;
+    BYE, LIST, DEADLINE, TODO, EVENT, MARK, UNMARK,DELETE,SAVE,READ,FIND;
 
     public static boolean isValidCommand(String input) {
         for (Command cmd : Command.values()) {
