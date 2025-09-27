@@ -1,10 +1,15 @@
 import Task.*;
 import errorcorrection.Command;
-import errorcorrection.DukeException;
+import errorcorrection.SpeedException;
 
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+
+/**
+ * The main class for the Speed chatbot application.
+ * This class handles user input, commands and manages the task list.
+ */
 
 public class Speed {
 
@@ -24,6 +29,10 @@ public class Speed {
         ui = new UI();
     }
 
+    /**
+     * Starts the main interactive loop for the application,
+     * displaying the welcome message and processing user commands
+     */
     public void run(){
         ui.welcomeMsg();
     }
@@ -115,7 +124,7 @@ public class Speed {
                     System.out.println(" OOPS!!! I'm sorry, but I don't know what that means :-(");
                     System.out.println(line);
                 }
-            } catch (DukeException e) {
+            } catch (SpeedException e) {
                 System.out.println(line);
                 System.out.println(" " + e.getMessage());
                 System.out.println(line);
@@ -123,13 +132,13 @@ public class Speed {
         }
     }
 
-    private static void getTodoDetails(String input, ArrayList<Task> todoList, String line) throws DukeException {
+    private static void getTodoDetails(String input, ArrayList<Task> todoList, String line) throws SpeedException {
         if (input.length() <= CMD_TODO.length()) {
-            throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
+            throw new SpeedException("OOPS!!! The description of a todo cannot be empty.");
         }
         String description = input.substring(CMD_TODO.length()).trim();
         if (description.isEmpty()) {
-            throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
+            throw new SpeedException("OOPS!!! The description of a todo cannot be empty.");
         }
         todoList.add(new TODO(description, false));
         saveTasks();
@@ -147,19 +156,31 @@ public class Speed {
 
     }
 
-    private static void getDeadlineDetails(String input, ArrayList<Task> todoList, String line) throws DukeException {
+    /**
+     * Parses the user's input to create a new Deadline task and adds it to the task list.
+     * <p>
+     * The input should be in the format: "deadline <description> /by <date?".
+     * The method checks for the valid input and throws a DukeException if the formate is incorrect
+     *
+     * @param input
+     * @param todoList
+     * @param line
+     * @throws SpeedException
+     */
+
+    private static void getDeadlineDetails(String input, ArrayList<Task> todoList, String line) throws SpeedException {
         if (input.length() <= CMD_DEADLINE.length()) {
-            throw new DukeException("OOPS!!! Please type “deadline <description> /by <date>”.");
+            throw new SpeedException("OOPS!!! Please type “deadline <description> /by <date>”.");
         }
         String rest = input.substring(CMD_DEADLINE.length()).trim();
         String[] split = rest.split("/by", 2);
         String description = split[0].trim();
         if (description.isEmpty()) {
-            throw new DukeException("OOPS!!! The description of a deadline cannot be empty.");
+            throw new SpeedException("OOPS!!! The description of a deadline cannot be empty.");
         }
         String by = split.length > 1 ? split[1].trim() : "";
         if (by.isEmpty()) {
-            throw new DukeException("OOPS!!! You must provide a /by for this deadline task.");
+            throw new SpeedException("OOPS!!! You must provide a /by for this deadline task.");
         }
         todoList.add(new Deadline(description, by, false));
         saveTasks();
@@ -167,27 +188,38 @@ public class Speed {
         System.out.println(line);
     }
 
-    private static void getEventDetails(String input, ArrayList<Task> todoList, String line) throws DukeException {
+    /**
+     * Parses the user input to create a new Event task and adds it to the task list
+     * <p>
+     * The inout should be in the formate: "event <Description> /from <Date> /to <Date>".
+     * The method checks for valid input and throws a DukeException if the formate is incorrect.
+     *
+     * @param input
+     * @param todoList
+     * @param line
+     * @throws SpeedException
+     */
+    private static void getEventDetails(String input, ArrayList<Task> todoList, String line) throws SpeedException {
         if (input.length() <= CMD_EVENT.length()) {
-            throw new DukeException("OOPS!!! The description of an event cannot be empty.");
+            throw new SpeedException("OOPS!!! The description of an event cannot be empty.");
         }
         String rest = input.substring(CMD_EVENT.length()).trim();
         String[] initialInput = rest.split("/from", 2);
         String description = initialInput[0].trim();
         if (description.isEmpty()) {
-            throw new DukeException("OOPS!!! The description of an event cannot be empty.");
+            throw new SpeedException("OOPS!!! The description of an event cannot be empty.");
         }
         if (initialInput.length < 2 || initialInput[1].trim().isEmpty()) {
-            throw new DukeException("OOPS!!! You must specify a /from time for the event.");
+            throw new SpeedException("OOPS!!! You must specify a /from time for the event.");
         }
         String[] dateParts = initialInput[1].trim().split("/to", 2);
         String from = dateParts[0].trim();
         String to = dateParts.length > 1 ? dateParts[1].trim() : "";
         if (from.isEmpty()) {
-            throw new DukeException("OOPS!!! The start time (/from) for the event is missing.");
+            throw new SpeedException("OOPS!!! The start time (/from) for the event is missing.");
         }
         if (to.isEmpty()) {
-            throw new DukeException("OOPS!!! The end time (/to) for the event is missing.");
+            throw new SpeedException("OOPS!!! The end time (/to) for the event is missing.");
         }
         todoList.add(new Event(description, from, to, false));
         saveTasks();
@@ -195,12 +227,25 @@ public class Speed {
         System.out.println(line);
     }
 
-    private static void handleMarkUnmark(String input, ArrayList<Task> todoList, String line, boolean mark) throws DukeException {
+    /**
+     * Marks the task that has been selected by the user as done.
+     * <p>
+     *     The input should be in the formate: mark <number of the task>".
+     *     This method checks of the number is within the total number of tasks already saved in the todoList
+     *
+     * @param input
+     * @param todoList
+     * @param line
+     * @param mark
+     * @throws SpeedException
+     */
+
+    private static void handleMarkUnmark(String input, ArrayList<Task> todoList, String line, boolean mark) throws SpeedException {
         try {
             String arg = mark ? input.substring(CMD_MARK.length()).trim() : input.substring(CMD_UNMARK.length()).trim();
             int index = Integer.parseInt(arg) - 1;
             if (index < 0 || index >= todoList.size()) {
-                throw new DukeException(" OOPS!!! Invalid task number. Please enter a valid index in your list.");
+                throw new SpeedException(" OOPS!!! Invalid task number. Please enter a valid index in your list.");
             }
             if (mark) {
                 todoList.get(index).markasDone();
@@ -210,16 +255,28 @@ public class Speed {
             System.out.println(line);
             saveTasks();
         } catch (NumberFormatException e) {
-            throw new DukeException(" OOPS!!! The index provided is not a valid number.");
+            throw new SpeedException(" OOPS!!! The index provided is not a valid number.");
         }
     }
 
-    private static void handleDelete(String input, ArrayList<Task> todoList, String line) throws DukeException {
+    /**
+     * Delete the task that has been choosen by the user
+     * <p>
+     * The input should be in the format: delete <number at which the task is in>
+     * The method ensurs that the number that the user wants to delete is valid throws a DukeException if the format is wrong
+     *
+     * @param input
+     * @param todoList
+     * @param line
+     * @throws SpeedException
+     */
+
+    private static void handleDelete(String input, ArrayList<Task> todoList, String line) throws SpeedException {
         if(todoList.isEmpty()) {
-            throw new DukeException("There are no task currently to delete. :)");
+            throw new SpeedException("There are no task currently to delete. :)");
         }
         if (input.length() < 7) {
-            throw new DukeException("Please input a number :)");
+            throw new SpeedException("Please input a number :)");
         }
         String number = input.substring(7).trim();
         int  index;
@@ -231,7 +288,7 @@ public class Speed {
             System.out.println("Now you have " + todoList.size() + " tasks in the list");
             System.out.println(line);
         } else {
-            throw new DukeException("Please make sure you delete the task within the listed tasks!");
+            throw new SpeedException("Please make sure you delete the task within the listed tasks!");
         }
             saveTasks();
         }catch(NumberFormatException e){
@@ -239,6 +296,10 @@ public class Speed {
             System.out.println(line);
         }
     }
+
+    /**
+     * Automatically saves task after every modification that is done to the list of tasks
+     */
 
     private static void saveTasks() {
         try {
@@ -248,7 +309,19 @@ public class Speed {
         }
     }
 
-    private static void findTask(String input, ArrayList<Task> todoList, String line) throws DukeException {
+    /**
+     * Finds the specific word in the list array and output the tasks that are using the word
+     *
+     * <p>
+     * The input should be in the format: "find <Description>".
+     * The methods throws SpeedException when the description is not found in the todoList
+     *
+     * @param input
+     * @param todoList
+     * @param line
+     * @throws SpeedException
+     */
+    private static void findTask(String input, ArrayList<Task> todoList, String line) throws SpeedException {
         String word = input.substring(4).trim();
         boolean found = false;
         for(Task task : todoList){
@@ -259,7 +332,7 @@ public class Speed {
 
         }
         if(!found){
-            throw new DukeException("OOPS!!! The was not found in the list.");
+            throw new SpeedException("OOPS!!! The was not found in the list.");
         }
         System.out.println(line);
 

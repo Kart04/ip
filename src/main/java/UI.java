@@ -1,6 +1,17 @@
+/**
+ * Handles user interface messages from the speed application.
+ * <p>
+ * Provides method to display welcome and goodbye messages to the user.
+ */
 public class UI {
     private static final String Line = "____________________________________________________________";
 
+    /**
+     * Prints the welcome message
+     * <P>
+     * Called at the start of the application to greet user.
+     *
+     */
     public void welcomeMsg(){
         System.out.println("This Speed :)");
         System.out.println("          _____                    _____                    _____                    _____                    _____                  \n" +
@@ -29,6 +40,13 @@ public class UI {
         System.out.println(Line);
     }
 
+    /**
+     * Prints the goodbye message to the console and notifies the user
+     * that their works has been saved
+     * <p>
+     * Called at the start of the application to greet the user.
+     *
+     */
     public void goodByeMsg(){
         System.out.println("It was great serving you!");
         System.out.println("Your work has been saved!!");

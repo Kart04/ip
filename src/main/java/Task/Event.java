@@ -1,5 +1,11 @@
 package Task;
 
+/**
+ * Represents an event task with a start and end time in the speed application.
+ * <p>
+ * An evetns extends the {@link Task} class and includes a description, a start time
+ * and the end time and the completion status.
+ */
 public class Event extends Task{
     private String From;
     private String To;

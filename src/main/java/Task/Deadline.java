@@ -1,3 +1,8 @@
+/**
+ *Represents a task with a deadline with description, a due date/time and a completion status
+ * Extends the {@link Task} class.
+ */
+
 package Task;
 
 public class Deadline extends Task {

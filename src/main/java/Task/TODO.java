@@ -1,3 +1,8 @@
+/**
+ * Represents the todo tasks with description
+ * Extends the {@link Task} class.
+ */
+
 package Task;
 
 public class TODO extends Task {

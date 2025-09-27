@@ -1,8 +1,20 @@
+/**
+ * Represents a generic task in the Speed applications.
+ * <p>
+ * This class serves as the base for more specific task types such as {@link Deadline}, {@link TODO} and {@link Event}.
+ * Each task has a description and a completion status.
+ * @author Karthik
+ * @version 1.0
+ * @since 25-08-10
+ */
 package Task;
 
 public class Task {
+
     private String description;
+
     private boolean isDone;
+
 
     public Task(String description, boolean isDone) {
         this.description = description;
@@ -28,6 +40,10 @@ public class Task {
     public void setDone(boolean done) {
         isDone = done;
     }
+
+    /**
+     * Marks the task as done. Equivalent to {@link #setDone(boolean) setdone(true)}.
+     */
     public void markasDone(){
         isDone = true;
     }

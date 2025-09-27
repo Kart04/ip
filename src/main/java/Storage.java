@@ -11,6 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles reading from and writing to the task data file from the Speed applications.
+ * <P>
+ * The storage class manages file creation, saving tasks and loading tasks from disk.
+ * It supports tasks of type {@link Task}, {@link Deadline}, {@link TODO} and {@link Event}.
+ */
 public class Storage {
     private String filePath;
 
