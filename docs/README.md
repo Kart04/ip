@@ -1,5 +1,5 @@
 # Speed User Guide
-![Product Screenshot](1.png)
+![Product Screenshot](./images/1.png)
 
 
 Speed is a command-line chatbot task manager designed to allow user to track and manage their daily
