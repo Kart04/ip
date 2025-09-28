@@ -1,5 +1,3 @@
-D | 0 | hw | 3pm
-T | 0 | gym
-D | 0 | return book | june 6th
-T | 0 | read book
-D | 0 | gym with bf | 10pm
+D | 0 | Submit report | Friday
+E | 0 | Team meeting | Mon 2pm | Mon 4pm
+T | 0 | Submit report

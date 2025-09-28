@@ -83,6 +83,7 @@ public class Speed {
                         for (int i = 0; i < todoList.size(); i++) {
                             System.out.println((i+1) + ". " + todoList.get(i));
                         }
+                        saveTasks();
                         System.out.println(line);
                         break;
                     } else {
