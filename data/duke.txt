@@ -1,3 +1,2 @@
-D | 0 | Submit report | Friday
-E | 0 | Team meeting | Mon 2pm | Mon 4pm
-T | 0 | Submit report
+T | 0 | gym
+E | 1 | gym with bro | 10pm | 11pm
