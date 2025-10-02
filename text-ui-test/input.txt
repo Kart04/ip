@@ -1,0 +1,10 @@
+todo gym
+event gym with bro /from 10pm /to 11pm
+deadline CS2113 hw /by 12pm
+list
+mark 2
+list
+delete 3
+bye
+list
+bye
